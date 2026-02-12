@@ -1,8 +1,25 @@
 import { NextRequest } from "next/server";
-import { appendFile, mkdir } from "node:fs/promises";
+import { appendFile, mkdir, access } from "node:fs/promises";
 import path from "node:path";
+import { constants } from "node:fs";
 
-const LOG_DIR = path.join(process.cwd(), "logs");
+// Determine the log directory based on environment
+// In serverless environments (Vercel, AWS Lambda), use /tmp
+// In local development, use project root logs directory
+function getLogDirectory(): string {
+  // Check if we're in a serverless environment
+  const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+  
+  if (isServerless) {
+    // Use /tmp in serverless environments (writable)
+    return "/tmp/logs";
+  }
+  
+  // Use project root in local development
+  return path.join(process.cwd(), "logs");
+}
+
+const LOG_DIR = getLogDirectory();
 const LOG_FILE = path.join(LOG_DIR, "events.log");
 
 export async function POST(req: NextRequest) {
@@ -57,18 +74,38 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ensure logs directory exists
-    try {
-      await mkdir(LOG_DIR, { recursive: true });
-    } catch (dirError) {
-      console.error("Failed to create logs directory:", dirError);
-      throw new Error(`Failed to create logs directory: ${dirError instanceof Error ? dirError.message : "Unknown error"}`);
-    }
-
+    // Create log entry object
     const entry = {
       timestamp: new Date().toISOString(),
       ...body,
     };
+
+    // Ensure logs directory exists and is writable
+    try {
+      await mkdir(LOG_DIR, { recursive: true });
+      // Verify we can write to the directory
+      await access(LOG_DIR, constants.W_OK);
+    } catch (dirError) {
+      console.error("Failed to create or access logs directory:", dirError);
+      console.error("Log directory path:", LOG_DIR);
+      console.error("Current working directory:", process.cwd());
+      console.error("Environment:", {
+        VERCEL: process.env.VERCEL,
+        AWS_LAMBDA: process.env.AWS_LAMBDA_FUNCTION_NAME,
+      });
+      
+      // In serverless environments, if /tmp fails, we can't log to disk
+      // Return success but log to console instead
+      if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+        console.log("Log entry (serverless - console only):", JSON.stringify(entry));
+        return new Response(JSON.stringify({ ok: true, loggedToConsole: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      
+      throw new Error(`Failed to create logs directory: ${dirError instanceof Error ? dirError.message : "Unknown error"}`);
+    }
 
     // Serialize entry to JSON with error handling for circular references
     let serializedEntry: string;
@@ -95,6 +132,16 @@ export async function POST(req: NextRequest) {
         logFile: LOG_FILE,
         logDir: LOG_DIR,
       });
+      
+      // If it's a read-only filesystem error in serverless, log to console instead
+      if (writeErrorMessage.includes("EROFS") || writeErrorMessage.includes("read-only")) {
+        console.log("Log entry (read-only filesystem - console only):", serializedEntry);
+        return new Response(JSON.stringify({ ok: true, loggedToConsole: true }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      
       throw new Error(`Failed to write log file: ${writeErrorMessage}`);
     }
 
