@@ -126,9 +126,9 @@ export function ContactField({
       modalMode === "create" || !value ? "create" : "update";
     onLogChange(action, contact);
 
-    // Fire-and-forget logging to server
+    // Fire-and-forget logging to server (errors are handled silently as per requirements)
     try {
-      await fetch("/api/log", {
+      const response = await fetch("/api/log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -137,8 +137,12 @@ export function ContactField({
           payload: contact,
         }),
       });
-    } catch {
-      // Swallow logging errors for this assignment
+      if (!response.ok) {
+        console.warn(`Logging failed for ${action} action:`, response.status);
+      }
+    } catch (error) {
+      // Logging errors are handled silently as per assignment requirements
+      console.warn("Failed to log contact change:", error);
     }
   };
 
@@ -196,7 +200,14 @@ export function ContactField({
           }}
         />
         {loading && (
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack 
+            direction="row" 
+            spacing={1} 
+            alignItems="center"
+            role="status"
+            aria-live="polite"
+            aria-label="Searching contacts"
+          >
             <CircularProgress size={20} />
             <Typography variant="body2" color="text.secondary">
               Searching…
@@ -204,7 +215,12 @@ export function ContactField({
           </Stack>
         )}
         {error && (
-          <Typography variant="body2" color="error">
+          <Typography 
+            variant="body2" 
+            color="error"
+            role="alert"
+            aria-live="assertive"
+          >
             {error}
           </Typography>
         )}

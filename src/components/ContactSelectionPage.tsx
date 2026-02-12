@@ -11,6 +11,8 @@ import {
   Divider,
   Button,
   Paper,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { AppState, Contact } from "@/types/contact";
 import { ContactField } from "@/components/ContactField";
@@ -39,11 +41,27 @@ function loadInitialState(): AppState {
 
 export function ContactSelectionPage() {
   const [state, setState] = React.useState<AppState>(() => loadInitialState());
+  const [snackbar, setSnackbar] = React.useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  const showSnackbar = React.useCallback(
+    (message: string, severity: "success" | "error" = "success") => {
+      setSnackbar({ open: true, message, severity });
+    },
+    []
+  );
 
   const handleFieldChange =
     (key: keyof AppState) =>
@@ -52,17 +70,17 @@ export function ContactSelectionPage() {
     };
 
   const handleLogChange = React.useCallback(
-    (action: "create" | "update", contact: Contact) => {
-      // Currently unused at the page level, but kept for potential extension
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const _noop = { action, contact };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (action: "create" | "update", _contact: Contact) => {
+      const actionLabel = action === "create" ? "created" : "updated";
+      showSnackbar(`Contact ${actionLabel} successfully`, "success");
     },
-    []
+    [showSnackbar]
   );
 
   const handleFinalSubmit = async () => {
     try {
-      await fetch("/api/log", {
+      const response = await fetch("/api/log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -70,10 +88,28 @@ export function ContactSelectionPage() {
           payload: state,
         }),
       });
-      // For this assignment we do not need further UI for success/failure
-    } catch {
-      // swallow logging errors
+
+      if (!response.ok) {
+        throw new Error(`Server responded with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data.ok) {
+        showSnackbar("All selections submitted and logged successfully", "success");
+      } else {
+        throw new Error("Server returned an error");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? `Failed to submit: ${error.message}`
+          : "Failed to submit selections. Please try again.";
+      showSnackbar(errorMessage, "error");
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -194,6 +230,21 @@ export function ContactSelectionPage() {
           </Paper>
         </Stack>
       </Container>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 }
