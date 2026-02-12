@@ -1,5 +1,6 @@
 'use client';
 
+import Grid from "@mui/material/Grid";
 import {
   Dialog,
   DialogTitle,
@@ -7,7 +8,6 @@ import {
   DialogActions,
   TextField,
   Button,
-  Grid,
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
@@ -137,7 +137,7 @@ export function ContactModal({
       </DialogTitle>
       <DialogContent dividers>
         <Grid container spacing={2} sx={{ mt: 1 }}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <ToggleButtonGroup
               exclusive
               value={draft.type}
@@ -148,7 +148,7 @@ export function ContactModal({
               <ToggleButton value="company">Company</ToggleButton>
             </ToggleButtonGroup>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               label="Name"
               fullWidth
@@ -159,7 +159,7 @@ export function ContactModal({
               required
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               label="Email"
               fullWidth
@@ -170,7 +170,7 @@ export function ContactModal({
               required
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
               label="Address Line 1"
               fullWidth
@@ -181,7 +181,7 @@ export function ContactModal({
               required
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               label="City"
               fullWidth
@@ -192,7 +192,7 @@ export function ContactModal({
               required
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               label="Country"
               fullWidth
@@ -204,7 +204,7 @@ export function ContactModal({
             />
           </Grid>
           {draft.type === "company" ? (
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Company Name"
                 fullWidth
@@ -217,7 +217,7 @@ export function ContactModal({
             </Grid>
           ) : (
             <>
-              <Grid item xs={12} sm={3}>
+              <Grid size={{ xs: 12, sm: 3 }}>
                 <TextField
                   label="First Name"
                   fullWidth
@@ -228,7 +228,7 @@ export function ContactModal({
                   required
                 />
               </Grid>
-              <Grid item xs={12} sm={3}>
+              <Grid size={{ xs: 12, sm: 3 }}>
                 <TextField
                   label="Last Name"
                   fullWidth
