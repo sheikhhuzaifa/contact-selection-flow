@@ -6,13 +6,13 @@ import {
   Stack,
   Chip,
   Button,
+  Avatar,
 } from "@mui/material";
 import { Contact } from "@/types/contact";
 
 interface ContactSummaryCardProps {
   contact: Contact;
   onEdit: () => void;
-  onCreateNew: () => void;
 }
 
 const REQUIRED_FIELDS: Array<keyof Contact> = [
@@ -23,11 +23,7 @@ const REQUIRED_FIELDS: Array<keyof Contact> = [
   "country",
 ];
 
-export function ContactSummaryCard({
-  contact,
-  onEdit,
-  onCreateNew,
-}: ContactSummaryCardProps) {
+export function ContactSummaryCard({ contact, onEdit }: ContactSummaryCardProps) {
   const missingFields: string[] = [];
 
   REQUIRED_FIELDS.forEach((field) => {
@@ -51,7 +47,14 @@ export function ContactSummaryCard({
   }
 
   return (
-    <Card variant="outlined">
+    <Card
+      variant="outlined"
+      sx={{
+        borderRadius: 3,
+        borderColor: missingFields.length ? "error.light" : "divider",
+        bgcolor: "background.paper",
+      }}
+    >
       <CardContent>
         <Stack
           direction="row"
@@ -60,7 +63,14 @@ export function ContactSummaryCard({
           spacing={2}
         >
           <Stack spacing={0.5}>
-            <Typography variant="h6">{contact.name || "Unnamed"}</Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Avatar sx={{ width: 32, height: 32 }}>
+                {(contact.name || "?").charAt(0).toUpperCase()}
+              </Avatar>
+              <Typography variant="h6">
+                {contact.name || "Unnamed"}
+              </Typography>
+            </Stack>
             <Typography variant="body2" color="text.secondary">
               {contact.email || "No email"}
             </Typography>
@@ -90,9 +100,6 @@ export function ContactSummaryCard({
       <CardActions sx={{ justifyContent: "flex-end" }}>
         <Button size="small" onClick={onEdit}>
           Edit
-        </Button>
-        <Button size="small" onClick={onCreateNew} variant="outlined">
-          Create New
         </Button>
       </CardActions>
     </Card>

@@ -11,7 +11,11 @@ import {
   Paper,
   Stack,
   CircularProgress,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";
 import { Contact, ContactFieldKey } from "@/types/contact";
 import { ContactSummaryCard } from "./ContactSummaryCard";
 import { ContactModal } from "./ContactModal";
@@ -139,15 +143,57 @@ export function ContactField({
   };
 
   return (
-    <Box component={Paper} variant="outlined" sx={{ p: 2 }}>
+    <Box
+      component={Paper}
+      variant="outlined"
+      sx={{
+        p: 2,
+        borderRadius: 3,
+        borderColor: value ? "primary.light" : "divider",
+        bgcolor: "background.paper",
+        backgroundImage: value
+          ? "linear-gradient(135deg, rgba(25,118,210,0.02), rgba(66,165,245,0.06))"
+          : "none",
+        transition: "box-shadow 0.2s ease, border-color 0.2s ease, transform 0.1s ease",
+        "&:hover": {
+          boxShadow: 3,
+          borderColor: "primary.main",
+          transform: "translateY(-2px)",
+        },
+      }}
+    >
       <Stack spacing={2}>
-        <Typography variant="h6">{label}</Typography>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Typography variant="subtitle1" fontWeight={600}>
+            {label}
+          </Typography>
+          <IconButton
+            size="small"
+            onClick={handleCreateNew}
+            color="primary"
+            aria-label={`Create new contact for ${label}`}
+          >
+            <AddIcon fontSize="small" />
+          </IconButton>
+        </Stack>
         <TextField
           label="Search contacts"
           variant="outlined"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           fullWidth
+          placeholder="Type a name, email, or company"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon fontSize="small" />
+              </InputAdornment>
+            ),
+          }}
         />
         {loading && (
           <Stack direction="row" spacing={1} alignItems="center">
@@ -163,7 +209,10 @@ export function ContactField({
           </Typography>
         )}
         {results.length > 0 && (
-          <Paper variant="outlined">
+          <Paper
+            variant="outlined"
+            sx={{ maxHeight: 260, overflowY: "auto", borderRadius: 2 }}
+          >
             <List dense>
               {results.map((contact) => (
                 <ListItemButton
@@ -184,7 +233,6 @@ export function ContactField({
           <ContactSummaryCard
             contact={value}
             onEdit={handleEdit}
-            onCreateNew={handleCreateNew}
           />
         )}
       </Stack>

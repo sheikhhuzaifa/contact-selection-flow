@@ -5,6 +5,9 @@ import { ThemeRegistry } from "./ThemeRegistry";
 export const metadata: Metadata = {
   title: "Contact Selection Flow",
   description: "Client and contact selection and editing flow",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

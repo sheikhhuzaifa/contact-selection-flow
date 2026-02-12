@@ -9,8 +9,34 @@ const theme = createTheme({
     primary: {
       main: "#1976d2",
     },
+    secondary: {
+      main: "#42a5f5",
+    },
     background: {
-      default: "#f5f5f5",
+      default: "#f5f7fb",
+    },
+  },
+  shape: {
+    borderRadius: 12,
+  },
+  components: {
+    MuiPaper: {
+      defaultProps: {
+        elevation: 0,
+      },
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          borderRadius: 999,
+        },
+      },
     },
   },
 });
@@ -23,4 +49,5 @@ export function ThemeRegistry({ children }: { children: React.ReactNode }) {
     </ThemeProvider>
   );
 }
+
 

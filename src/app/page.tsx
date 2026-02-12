@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import {
+  AppBar,
+  Toolbar,
   Box,
   Container,
   Stack,
@@ -75,33 +77,59 @@ export default function Home() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Stack spacing={3}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            Client & Contact Selection
+    <>
+      <AppBar position="sticky" color="inherit" elevation={0}>
+        <Toolbar sx={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Contact Selection Flow
           </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Search, select, and edit contact details for your client and their
-            primary and secondary contacts.
-          </Typography>
-        </Box>
-
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="md" sx={{ py: 4 }}>
         <Stack spacing={3}>
-          <ContactField
-            label="Client 1"
-            fieldKey="client"
-            value={state.client}
-            onChange={handleFieldChange("client")}
-            onLogChange={handleLogChange}
-          />
-          <ContactField
-            label="Client 1 Primary Contact"
-            fieldKey="primaryContact"
-            value={state.primaryContact}
-            onChange={handleFieldChange("primaryContact")}
-            onLogChange={handleLogChange}
-          />
+          <Paper
+            sx={{
+              p: 3,
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+            }}
+          >
+            <Typography variant="h4">
+              Client &amp; Contact Selection
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Search, select, and refine contact details for your client and
+              their primary and secondary contacts. Changes are saved
+              automatically.
+            </Typography>
+          </Paper>
+
+          <Stack
+            spacing={3}
+            direction={{ xs: "column", md: "row" }}
+            alignItems="stretch"
+          >
+            <Box flex={1}>
+              <ContactField
+                label="Client 1"
+                fieldKey="client"
+                value={state.client}
+                onChange={handleFieldChange("client")}
+                onLogChange={handleLogChange}
+              />
+            </Box>
+            <Box flex={1}>
+              <ContactField
+                label="Client 1 Primary Contact"
+                fieldKey="primaryContact"
+                value={state.primaryContact}
+                onChange={handleFieldChange("primaryContact")}
+                onLogChange={handleLogChange}
+              />
+            </Box>
+          </Stack>
+
           <ContactField
             label="Client 1 Secondary Contact"
             fieldKey="secondaryContact"
@@ -109,32 +137,33 @@ export default function Home() {
             onChange={handleFieldChange("secondaryContact")}
             onLogChange={handleLogChange}
           />
-        </Stack>
 
-        <Divider />
+          <Divider />
 
-        <Paper
-          elevation={0}
-          sx={{
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="body2" color="text.secondary">
-            When you are finished, submit the current selections. This will log
-            the full payload on the server.
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFinalSubmit}
+          <Paper
+            sx={{
+              p: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 2,
+            }}
           >
-            Final Submit
-          </Button>
-        </Paper>
-      </Stack>
-    </Container>
+            <Typography variant="body2" color="text.secondary">
+              Review your selections above. When you are satisfied, use{" "}
+              <strong>Final Submit</strong> to log the full configuration on the
+              server.
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleFinalSubmit}
+            >
+              Final Submit
+            </Button>
+          </Paper>
+        </Stack>
+      </Container>
+    </>
   );
 }
