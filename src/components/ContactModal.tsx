@@ -115,12 +115,19 @@ export function ContactModal({
 
   const handleSave = () => {
     if (!draft) return;
+    let resolvedName = draft.name.trim();
+
+    if (!resolvedName) {
+      if (draft.type === "individual") {
+        resolvedName = `${draft.firstName ?? ""} ${draft.lastName ?? ""}`.trim();
+      } else {
+        resolvedName = (draft.companyName ?? "").trim();
+      }
+    }
+
     const updated: Contact = {
       ...draft,
-      name:
-        draft.type === "individual"
-          ? `${draft.firstName ?? ""} ${draft.lastName ?? ""}`.trim()
-          : draft.companyName ?? draft.name,
+      name: resolvedName,
     };
 
     if (!validate(updated)) {
