@@ -90,14 +90,33 @@ export function ContactSelectionPage() {
       });
 
       if (!response.ok) {
-        throw new Error(`Server responded with status ${response.status}`);
+        // Try to get error details from response
+        let errorDetails = `Server responded with status ${response.status}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.message) {
+            errorDetails = errorData.message;
+          } else if (errorData.error) {
+            errorDetails = errorData.error;
+          }
+        } catch {
+          // If we can't parse the error response, use the status
+        }
+        throw new Error(errorDetails);
       }
 
-      const data = await response.json();
-      if (data.ok) {
+      let data;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        throw new Error("Failed to parse server response");
+      }
+
+      if (data && data.ok) {
         showSnackbar("All selections submitted and logged successfully", "success");
       } else {
-        throw new Error("Server returned an error");
+        const errorMsg = data?.message || data?.error || "Server returned an error";
+        throw new Error(errorMsg);
       }
     } catch (error) {
       const errorMessage =
@@ -105,6 +124,7 @@ export function ContactSelectionPage() {
           ? `Failed to submit: ${error.message}`
           : "Failed to submit selections. Please try again.";
       showSnackbar(errorMessage, "error");
+      console.error("Submit error:", error);
     }
   };
 
