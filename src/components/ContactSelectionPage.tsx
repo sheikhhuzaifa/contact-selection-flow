@@ -85,20 +85,27 @@ export function ContactSelectionPage() {
           </Typography>
         </Toolbar>
       </AppBar>
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Stack spacing={3}>
+      <Container maxWidth="md" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 2, sm: 3 } }}>
+        <Stack spacing={{ xs: 2, sm: 3 }}>
           <Paper
             sx={{
-              p: 3,
+              p: { xs: 2.5, sm: 3 },
               display: "flex",
               flexDirection: "column",
-              gap: 1,
+              gap: { xs: 1.5, sm: 1 },
             }}
           >
-            <Typography variant="h4">
+            <Typography 
+              variant="h4"
+              sx={{ fontSize: { xs: "1.5rem", sm: "2rem" } }}
+            >
               Client &amp; Contact Selection
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography 
+              variant="body1" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+            >
               Search, select, and refine contact details for your client and
               their primary and secondary contacts. Changes are saved
               automatically.
@@ -106,7 +113,7 @@ export function ContactSelectionPage() {
           </Paper>
 
           <Stack
-            spacing={3}
+            spacing={{ xs: 2, sm: 3 }}
             direction={{ xs: "column", md: "row" }}
             alignItems="stretch"
           >
@@ -142,14 +149,24 @@ export function ContactSelectionPage() {
 
           <Paper
             sx={{
-              p: 2,
+              p: { xs: 2.5, sm: 2.5, md: 3 },
               display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
               justifyContent: "space-between",
-              alignItems: "center",
-              gap: 2,
+              alignItems: { xs: "stretch", sm: "center" },
+              gap: { xs: 2.5, sm: 2 },
             }}
           >
-            <Typography variant="body2" color="text.secondary">
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ 
+                flex: { xs: "none", sm: 1 },
+                mb: 0,
+                textAlign: { xs: "left", sm: "left" },
+                lineHeight: 1.6,
+              }}
+            >
               Review your selections above. When you are satisfied, use{" "}
               <strong>Final Submit</strong> to log the full configuration on the
               server.
@@ -158,6 +175,19 @@ export function ContactSelectionPage() {
               variant="contained"
               color="primary"
               onClick={handleFinalSubmit}
+              fullWidth={false}
+              sx={{
+                width: { xs: "100%", sm: "auto" },
+                minWidth: { xs: "100%", sm: "140px" },
+                px: { xs: 3, sm: 3, md: 4 },
+                py: { xs: 1.75, sm: 1.25 },
+                fontSize: { xs: "0.9375rem", sm: "0.9375rem", md: "1rem" },
+                fontWeight: 600,
+                borderRadius: { xs: 2, sm: "999px" },
+                textTransform: "none",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+              }}
             >
               Final Submit
             </Button>
